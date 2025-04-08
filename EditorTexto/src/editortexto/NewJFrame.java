@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 
+
 /**
  *
  * @author Joshua
@@ -17,6 +18,8 @@ import java.util.*;
 public class NewJFrame extends javax.swing.JFrame {
 
     String ruta = "";
+    Stack<String> undo=new Stack<String>();
+    Stack<String> redo=new Stack<String>();
 
     /**
      * Creates new form NewJFrame
@@ -24,12 +27,12 @@ public class NewJFrame extends javax.swing.JFrame {
     public NewJFrame() {
         initComponents();
         setLocationRelativeTo(null);
-        if(this.ruta!=""){
-           setTitle(this.ruta); 
-        }else{
+        if (this.ruta != "") {
+            setTitle(this.ruta);
+        } else {
             setTitle("untitled");
         }
-        
+
     }
 
     /**
@@ -57,6 +60,11 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
+        jTextArea1.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                jTextArea1CaretUpdate(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTextArea1);
 
         jMenu1.setText("File");
@@ -103,6 +111,11 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         jMenuItem5.setText("Undo");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem5);
 
         jMenuItem6.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK));
@@ -132,56 +145,129 @@ public class NewJFrame extends javax.swing.JFrame {
         if (salida == JOptionPane.YES_OPTION) {
             jTextArea1.setText("");
             this.ruta = "";
-             setTitle("untitled"); 
+            setTitle("untitled");
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         JFileChooser fc = new JFileChooser();
-      
-        int resultado=fc.showOpenDialog(null);
+
+        int resultado = fc.showOpenDialog(null);
         File directorioSeleccionado = fc.getSelectedFile();
         this.ruta = directorioSeleccionado.getAbsolutePath();
-         setTitle(this.ruta); 
-        if(this.ruta.contains(".txt")){
-           StringBuilder contenido = new StringBuilder();
-        try ( BufferedReader lecturaArchivo = new BufferedReader(new FileReader(this.ruta))) {
+        setTitle(this.ruta);
+        if (this.ruta.contains(".txt")) {
+            StringBuilder contenido = new StringBuilder();
+            try ( BufferedReader lecturaArchivo = new BufferedReader(new FileReader(this.ruta))) {
 
-            String lectura;
-            while ((lectura = lecturaArchivo.readLine()) != null) {
-                contenido.append(lectura).append("\n");
+                String lectura;
+                while ((lectura = lecturaArchivo.readLine()) != null) {
+                    contenido.append(lectura).append("\n");
 
+                }
+                jTextArea1.setText(contenido.toString());
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "NO SE HA PODIDO LEER EL ARCHIVO", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-            jTextArea1.setText(contenido.toString());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "NO SE HA PODIDO LEER EL ARCHIVO", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }  
-        }else{
-            JOptionPane.showMessageDialog(null, "Sólo se aceptan archivos txt","Error",JOptionPane.ERROR_MESSAGE);
-            
+        } else {
+            JOptionPane.showMessageDialog(null, "Sólo se aceptan archivos txt", "Error", JOptionPane.ERROR_MESSAGE);
+
         }
 
-       
+
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-       
-    File archivo=new File(this.ruta);
-    try{
-    FileWriter lector=new FileWriter(archivo);
-   BufferedWriter b=new BufferedWriter(lector);
-   
-   b.write(jTextArea1.getText());
-   b.close();
-    }catch(Exception e){
-        
-    }
+        if (!this.ruta.equals("")) {
+            File archivo = new File(this.ruta);
+            try {
+                FileWriter lector = new FileWriter(archivo);
+                BufferedWriter b = new BufferedWriter(lector);
+
+                b.write(jTextArea1.getText());
+                b.close();
+            } catch (Exception e) {
+
+            }
+        } else {
+  JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar archivo de texto");
+
+        // Mostrar el diálogo de guardar
+        int seleccion = fileChooser.showSaveDialog(null);
+
+        // Si el usuario hace clic en "Guardar"
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+
+            // Asegurarse de que el archivo tenga extensión .txt
+            if (!archivoSeleccionado.getName().toLowerCase().endsWith(".txt")) {
+                archivoSeleccionado = new File(archivoSeleccionado.getAbsolutePath() + ".txt");
+            }
+
+            try (FileWriter writer = new FileWriter(archivoSeleccionado)) {
+                // Contenido que queremos guardar
+                String contenido = jTextArea1.getText();
+
+                // Escribir el contenido en el archivo
+                writer.write(contenido);
+
+                JOptionPane.showMessageDialog(null, "Archivo guardado en:\n" + archivoSeleccionado.getAbsolutePath());
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al guardar el archivo:\n" + e.getMessage());
+            }
+        } else {
+            System.out.println("El usuario canceló la operación.");
+        }
+         
+         
+        }
+
 
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        // TODO add your handling code here:
+         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar archivo de texto");
+
+        // Mostrar el diálogo de guardar
+        int seleccion = fileChooser.showSaveDialog(null);
+
+        // Si el usuario hace clic en "Guardar"
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+
+            // Asegurarse de que el archivo tenga extensión .txt
+            if (!archivoSeleccionado.getName().toLowerCase().endsWith(".txt")) {
+                archivoSeleccionado = new File(archivoSeleccionado.getAbsolutePath() + ".txt");
+            }
+
+            try (FileWriter writer = new FileWriter(archivoSeleccionado)) {
+                // Contenido que queremos guardar
+                String contenido = jTextArea1.getText();
+
+                // Escribir el contenido en el archivo
+                writer.write(contenido);
+
+                JOptionPane.showMessageDialog(null, "Archivo guardado en:\n" + archivoSeleccionado.getAbsolutePath());
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al guardar el archivo:\n" + e.getMessage());
+            }
+        } else {
+            System.out.println("El usuario canceló la operación.");
+        }
+         
+         
+        
     }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+       
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jTextArea1CaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_jTextArea1CaretUpdate
+        System.out.println("cambio");
+    }//GEN-LAST:event_jTextArea1CaretUpdate
 
     /**
      * @param args the command line arguments
