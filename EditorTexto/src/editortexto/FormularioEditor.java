@@ -143,6 +143,11 @@ public class FormularioEditor extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTextArea1);
 
         jMenu1.setText("File");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
 
         jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         jMenuItem1.setText("New");
@@ -273,6 +278,10 @@ public class FormularioEditor extends javax.swing.JFrame {
                     contenido.append(lectura).append("\n");
 
                 }
+                 this.undo.clear();
+            this.undo.push("");
+            this.redo.clear();
+            this.tiempo.clear();
                 jTextArea1.setText(contenido.toString());
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "NO SE HA PODIDO LEER EL ARCHIVO", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -303,23 +312,27 @@ public class FormularioEditor extends javax.swing.JFrame {
   JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar archivo de texto");
 
-        // Mostrar el diálogo de guardar
+       
         int seleccion = fileChooser.showSaveDialog(null);
 
-        // Si el usuario hace clic en "Guardar"
+       
         if (seleccion == JFileChooser.APPROVE_OPTION) {
             File archivoSeleccionado = fileChooser.getSelectedFile();
+            this.ruta=archivoSeleccionado.getAbsolutePath();
+            setTitle(this.ruta);
 
-            // Asegurarse de que el archivo tenga extensión .txt
+           
             if (!archivoSeleccionado.getName().toLowerCase().endsWith(".txt")) {
                 archivoSeleccionado = new File(archivoSeleccionado.getAbsolutePath() + ".txt");
+                this.ruta=archivoSeleccionado.getAbsolutePath()+".txt";
+            setTitle(this.ruta);
             }
 
             try (FileWriter writer = new FileWriter(archivoSeleccionado)) {
-                // Contenido que queremos guardar
+               
                 String contenido = jTextArea1.getText();
 
-                // Escribir el contenido en el archivo
+              
                 writer.write(contenido);
 
                 JOptionPane.showMessageDialog(null, "Archivo guardado en:\n" + archivoSeleccionado.getAbsolutePath());
@@ -340,23 +353,27 @@ public class FormularioEditor extends javax.swing.JFrame {
          JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar archivo de texto");
 
-        // Mostrar el diálogo de guardar
+       
         int seleccion = fileChooser.showSaveDialog(null);
 
-        // Si el usuario hace clic en "Guardar"
+        
         if (seleccion == JFileChooser.APPROVE_OPTION) {
             File archivoSeleccionado = fileChooser.getSelectedFile();
-
-            // Asegurarse de que el archivo tenga extensión .txt
+           
+            this.ruta=archivoSeleccionado.getAbsolutePath();
+            setTitle(this.ruta);
+           
             if (!archivoSeleccionado.getName().toLowerCase().endsWith(".txt")) {
                 archivoSeleccionado = new File(archivoSeleccionado.getAbsolutePath() + ".txt");
+                this.ruta=archivoSeleccionado.getAbsolutePath()+".txt";
+            setTitle(this.ruta);
             }
 
             try (FileWriter writer = new FileWriter(archivoSeleccionado)) {
-                // Contenido que queremos guardar
+                
                 String contenido = jTextArea1.getText();
 
-                // Escribir el contenido en el archivo
+                
                 writer.write(contenido);
 
                 JOptionPane.showMessageDialog(null, "Archivo guardado en:\n" + archivoSeleccionado.getAbsolutePath());
@@ -501,6 +518,10 @@ if(!Character.isISOControl(evt.getKeyChar()) && contador==1){
        }
        
     }//GEN-LAST:event_jMenuItem8ActionPerformed
+
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenu1ActionPerformed
 
     /**
      * @param args the command line arguments
